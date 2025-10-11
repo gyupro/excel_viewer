@@ -79,7 +79,7 @@ export default function CarTable() {
   const [visibleColumns, setVisibleColumns] = useState<string[]>([]); // Columns to display
   const [columnOrder, setColumnOrder] = useState<string[]>([]); // Order of columns
   const [showColumnManager, setShowColumnManager] = useState(false); // Column manager modal
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [displayCount, setDisplayCount] = useState(20); // For infinite scroll
   const [sortBy, setSortBy] = useState('');
@@ -105,10 +105,10 @@ export default function CarTable() {
 
   const itemsPerLoad = 20;
 
-  // Fetch all data once on mount
-  useEffect(() => {
-    fetchAllCars();
-  }, []);
+  // Don't auto-fetch on mount - wait for file upload
+  // useEffect(() => {
+  //   fetchAllCars();
+  // }, []);
 
   const fetchAllCars = async () => {
     setLoading(true);
