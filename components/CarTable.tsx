@@ -36,10 +36,10 @@ function formatNumber(value: any): string {
 
   const strValue = String(value);
 
-  // Check if the value is a pure number (possibly with commas already)
-  const cleanedValue = strValue.replace(/,/g, '');
+  // Remove common number formatting (commas, spaces, 원, 만원, Km, km)
+  const cleanedValue = strValue.replace(/[,\s]/g, '').replace(/원|만원|Km|km/gi, '');
 
-  // If it's a valid number, format it
+  // If it's a valid number, format it with thousand separators
   if (/^\d+$/.test(cleanedValue)) {
     return Number(cleanedValue).toLocaleString('ko-KR');
   }
@@ -60,12 +60,26 @@ function formatCellValue(column: string, value: any): string {
   const isPriceColumn = /가격|출품가|금액|price|amount|원|won/i.test(column);
   const isMileageColumn = /주행거리|거리|mileage|km/i.test(column);
 
-  if (isPriceColumn || isMileageColumn) {
+  if (isPriceColumn) {
+    // For price columns, extract number and add unit back
+    const cleaned = strValue.replace(/[,\s]/g, '').replace(/원|만원/gi, '');
+    if (/^\d+$/.test(cleaned)) {
+      const formatted = Number(cleaned).toLocaleString('ko-KR');
+      // Check if original had 만원
+      if (/만원/i.test(strValue)) {
+        return formatted + ' 만원';
+      }
+      return formatted;
+    }
+    return strValue;
+  }
+
+  if (isMileageColumn) {
     return formatNumber(strValue);
   }
 
   // For other columns, still format if it looks like a pure number
-  const cleaned = strValue.replace(/,/g, '');
+  const cleaned = strValue.replace(/[,\s]/g, '');
   if (/^\d+$/.test(cleaned) && cleaned.length >= 4) {
     return Number(cleaned).toLocaleString('ko-KR');
   }
